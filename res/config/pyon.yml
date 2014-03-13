@@ -30,22 +30,17 @@ system:
   # True is Real, False is fake
   smtp: False
 
-  # Use ElasticSearch ? (also set bootstrap.use_es if the container should build
-  # the search indices
-  elasticsearch: False
-
   # Indicates whether policy should be loaded during system bootstrap (False is for development only)
   load_policy: False
 
-  # The base web ui URL
+  # The base web UI URL
   web_ui_url: http://localhost:3000/
 
 
 bootstrap:
-  # Launches a bootstrap instance to build the search indices.
-  use_es: False
   # Launches a registration worker to register DAP datasets with PyDAP
   use_pydap: False
+
 
 # ----------------------------------------------------------------------------------
 # The "server" root entry defines profiles for connections/credentials TO external servers
@@ -108,22 +103,6 @@ server:
     port: 25
     sender: data_alerts@oceanobservatories.org
     password: ""
-  elasticsearch:
-    # Search index server
-    type:           elasticsearch
-    host:           localhost
-    port:           9200
-    timeout:        10
-    shards:         1        # Defines the default number of shards for indexes
-    replicas:       0        # Defines the default number of replicas for each shard
-    river_shards:   1        # Defines the number of shards for the _river
-    river_replicas: 0        # Defines the number of replicas (important) for the _river
-                             # This number should be the number of nodes running exactly
-# Example of production-like configuration
-#    shards: 5
-#    replicas: 1
-#    river_shards: 5
-#    replicas: 1
   #oms event receiver currently co-locates within service gateway
   oms:
     host: localhost
@@ -211,6 +190,7 @@ container:
 
   objects:
     validate: # TODO: move entries to here
+      setattr: False
 
   org_boundary: False  # If True, then check against policies related to the Org below; else do not.
 
@@ -232,7 +212,15 @@ container:
       port: 8001
 
   flask_webapp:
-    port: 8080
+    port: 8080   # Port of the container UI - TODO: move under containerui config
+
+  containerui:
+    association_graph: False    # Show D3 graph of associations
+    read_only: False            # Run in read-only mode
+
+  tracer:
+    enabled: False        # Enable the database class and message tracer in container
+    max_entries: 10000    # Length of trace buffer
 
       
 # TODO: Rename to "container". See there.
@@ -245,9 +233,6 @@ cc:
     heartbeat_proc_time_threshold: 600.0
     heartbeat_proc_count_threshold: 20
 
-validate:
-  setattr: True
-
 endpoint:
   receive:
     timeout: 30   # RPC receive timeout in seconds
@@ -258,8 +243,6 @@ interceptor:
       class: pyon.core.interceptor.sample.SampleInterceptor
     sampleprocessonly:
       class: pyon.core.interceptor.sample.SampleProcessOnlyInterceptor
-    codec:
-      class: pyon.core.interceptor.codec.CodecInterceptor
     validate:
       class: pyon.core.interceptor.validate.ValidateInterceptor
       config:
@@ -282,8 +265,8 @@ interceptor:
             class: pyon.core.governance.policy.policy_interceptor.PolicyInterceptor
 
   stack:
-    message_outgoing: [validate, codec, encode]
-    message_incoming: [encode, codec, validate]
+    message_outgoing: [validate, encode]
+    message_incoming: [encode, validate]
     process_outgoing: [governance]
     process_incoming: [governance]
 
@@ -347,13 +330,13 @@ service:
                               #no trailing slash
 
   directory:
-    default_uispecs_url: "https://userexperience.oceanobservatories.org/database-exports/"
+    default_uispecs_url: "http://userexperience.oceanobservatories.org/database-exports/Stable"
 
   ingestion:
     ignore_gaps: false
 
   discovery:
-    search_buffer_size: 1048576
+    max_search_results: 250
 
   qc_processing:
     # Run every N hours
@@ -424,13 +407,14 @@ device:
     port_agent_data_port: 4000
     port_agent_cmd_port: 4003
     port_agent_binary: port_agent
-    dvr_egg: "http://sddevrepo.oceanobservatories.org/releases/seabird_sbe37smb_ooicore-0.1.5-py2.7.egg"
+    dvr_egg: "http://sddevrepo.oceanobservatories.org/releases/seabird_sbe37smb_ooicore-0.1.6-py2.7.egg"
     dvr_sha: "b2c8131ae65bdc9b0decd829dade0c7cb16c6fdf"
     dvr_mod: "mi.instrument.seabird.sbe37smb.ooicore.driver"
     dvr_cls: "SBE37Driver"
     workdir: "/tmp/"
     delim: ["<<",">>"]
-
+  dataset_agent:
+    datasource_cache_dir: /tmp/dsastore
 
 units: res/config/units/udunits2.xml
 

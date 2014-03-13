@@ -11,9 +11,11 @@ version: 0.2
 
 config:
   bootstrap:
-    use_es: false
     use_pydap: true
   container:
+    exchange:
+      names:
+        durable: true
     filesystem:
       root: /ion-beta/r2/data
       force_clean: false
@@ -24,16 +26,18 @@ config:
       web_server:
         host: 0.0.0.0
         port: 10999
+    objects:
+      validate:
+        setattr: False
+  interceptor:
+    interceptors:
+      validate:
+        config:
+          enabled: False
   endpoint:
     receive:
       timeout: 60
   server:
-    elasticsearch:
-      host: es.b.oceanobservatories.org
-      shards: 5
-      replicas: 1
-      river_shards: 1
-      river_replicas: 2
     erddap:
       host: erddap.b.oceanobservatories.org
       port: 8080
@@ -43,9 +47,11 @@ config:
       port: 10999
     oms:
       host: sg.b.oceanobservatories.org
+  device:
+    dataset_agent:
+      datasource_cache_dir: /ion-beta/r2/dsastore
   system:
-    web_ui_url: http://ion-beta.oceanobservatories.org/
-    elasticsearch: true
+    web_ui_url: http://ooinet.oceanobservatories.org/
     smtp: true
     load_policy: true
   processdispatcher:
@@ -70,7 +76,7 @@ basenodes:
 
 execution_engines:
   default:
-    base_need: 4
+    base_need: 6
     replicas: 4
     slots: 25
   service_gateway:
@@ -83,11 +89,15 @@ execution_engines:
   instrument_agent:
     base_need: 2
     replicas: 4
-    slots: 5
+    slots: 10
   ingestion_worker:
     base_need: 2
     replicas: 4
-    slots: 5
+    slots: 10
+  visualization:
+    base_need: 2
+    replicas: 4
+    slots: 10
 
 default_execution_engine: default
 
@@ -104,6 +114,8 @@ process_engines:
   ion.agents.platform: instrument_agent
   ion.agents.data: instrument_agent
   ion.processes.data.transforms.qc_post_processing: service_gateway
+  ion.processes.data.transforms.viz: visualization
+
 #############################################################################
 #  APPS
 #############################################################################

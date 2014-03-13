@@ -3,6 +3,7 @@
 # See Events and Notification hierarchy here:
 #   https://confluence.oceanobservatories.org/display/syseng/CIAD+DM+SV+Events+and+Notifications
 #
+#@TypeVersion=1
 Event:
   origin: ""        # the origin of the event (content specific to subtype). Mostly a resource id
   origin_type: ""   # the type of origin (e.g. resource type, etc) or empty
@@ -11,7 +12,7 @@ Event:
   base_types: []    # List of event super types
   sub_type: ""      # A specialization of the event_type expressed by this object type (or empty)
   actor_id: ""      # The actor ID requesting the action causing the event
-
+  persisted_version: 1 # The last version in which the event instance was saved (persisted)
 
 # Object containing additional computed information about one Event
 EventComputedAttributes:
@@ -111,6 +112,10 @@ ResourceAgentErrorEvent: !Extends_ResourceAgentEvent
   error_type: ""
   error_msg: ""
   error_code: -1
+
+ResourceAgentIOEvent: !Extends_ResourceAgentEvent
+  source_type: ""
+  stats: {}
 
 ResourceAgentConnectionLostErrorEvent: !Extends_ResourceAgentEvent
   error_msg: "Connection to resource device was lost."
@@ -241,6 +246,33 @@ InformationContentAccessedEvent: !Extends_InformationContentEvent
 
   # Additional information about access
   access_params: {}
+
+
+
+# ------------------------------------------------------------------------------------
+# Data Process Events
+# Events about data processes and data process definitions
+#
+# origin: set to the data process id
+# origin_type: the type of resource
+# ------------------------------------------------------------------------------------
+
+# Base type of events related to data processes
+DataProcessEvent: !Extends_Event
+    # The origin is a data process (resource) id
+
+DataProcessStatusType: !enum (values=(NORMAL, ERROR, OFFLINE), default=NORMAL)
+
+---
+
+
+# To be used by transforms monitoring the health of data producers to report the status of the producers
+DataProcessStatusEvent: !Extends_DataProcessEvent
+  status: !DataProcessStatusType
+  values: []
+
+
+
 
 
 # ------------------------------------------------------------------------------------

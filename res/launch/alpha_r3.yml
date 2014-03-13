@@ -1,5 +1,5 @@
 type: launch
-name: stage
+name: alpha
 version: 0.2
 
 #############################################################################
@@ -17,7 +17,7 @@ config:
       names:
         durable: true
     filesystem:
-      root: /ion-stage/r2/data
+      root: /ion-alpha/r3/data
       force_clean: false
     sflow:
       enabled: true
@@ -39,19 +39,16 @@ config:
       timeout: 60
   server:
     erddap:
-      host: erddap.s.oceanobservatories.org
+      host: erddap.a3.oceanobservatories.org
       port: 8080
       type: erddap
     pydap:
-      host: sg.s.oceanobservatories.org
+      host: sg.a3.oceanobservatories.org
       port: 10999
     oms:
-      host: sg.s.oceanobservatories.org
-  device:
-    dataset_agent:
-      datasource_cache_dir: /ion-stage/r2/dsastore
+      host: sg.a3.oceanobservatories.org
   system:
-    web_ui_url: http://ion-stage.oceanobservatories.org/
+    web_ui_url: http://r3-alpha.oceanobservatories.org/
     smtp: true
     load_policy: true
   processdispatcher:
@@ -76,7 +73,7 @@ basenodes:
 
 execution_engines:
   default:
-    base_need: 4
+    base_need: 3
     replicas: 4
     slots: 25
   service_gateway:
@@ -123,7 +120,7 @@ app_defaults:
   ha:
     policy: npreserving
     parameters:
-      preserve_n: 8
+      preserve_n: 4
 
 # apps included below override the app_defaults block. apps present in the REL
 # but not below use the app_defaults block
@@ -170,37 +167,6 @@ apps:
         parameters:
           preserve_n: 1
 
-  #Bump up the work intensive guys from UI
-  resource_registry:
-    ha:
-        policy: npreserving
-        parameters:
-          preserve_n: 30
-  org_management:
-    ha:
-        policy: npreserving
-        parameters:
-          preserve_n: 30
-  data_product_management:
-    ha:
-        policy: npreserving
-        parameters:
-          preserve_n: 30
-  instrument_management:
-    ha:
-        policy: npreserving
-        parameters:
-          preserve_n: 30
-  observatory_management:
-    ha:
-        policy: npreserving
-        parameters:
-          preserve_n: 30
-  visualization:
-    ha:
-        policy: npreserving
-        parameters:
-          preserve_n: 30
   # gateway uses special engine
   service_gateway:
     ha:
