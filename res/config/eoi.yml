@@ -1,7 +1,7 @@
 # EOI tree format
 eoi:
     meta:
-        use_eoi_services: True
+        use_eoi_services: False
         debug: True
         lat_field: lat
         lon_field: lon
