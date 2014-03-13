@@ -1,7 +1,8 @@
 # EOI tree format
 eoi:
     meta:
-        debug: true
+        use_eoi_services: True
+        debug: True
         lat_field: lat
         lon_field: lon
 #geoserver serving OWS/W*S services and geo layers
