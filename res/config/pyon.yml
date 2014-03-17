@@ -443,8 +443,8 @@ eoi:
         port: 5432
         table_prefix: _
         table_suffix: _view
-        session_startup_ln1: select runCovTest();
-        session_startup_ln2: select 1 from covtest limit 1;
+        session_startup_ln1: select appendPath();
+        session_startup_ln2:  
 #importer service for geoserver        
     importer_service:
         server: http://localhost
